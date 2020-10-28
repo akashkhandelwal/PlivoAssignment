@@ -1,17 +1,16 @@
 package plivoAssignment;
 
 import java.util.HashMap;
-import java.util.Map;
 
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.json.JSONObject;
 
-import io.restassured.RestAssured;
-import io.restassured.http.Method;
+
 import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
 
 public class PlivoActions extends CommonActions{
+	
+	private static final Logger logger = LogManager.getLogger(PlivoActions.class);
 	
 	public static String END_POINT_PREFIX = "/v1/Account/"+testInputData.get("auth_id")+"/";
 	public static String GET_ALL_NUMBERS_ENDPOINT = END_POINT_PREFIX+"PhoneNumber/?country_iso=US";
@@ -25,7 +24,9 @@ public class PlivoActions extends CommonActions{
 	 */
 	public static String getCashCredit() {
 		Response response = APICallUtil.getCall(END_POINT_PREFIX);
+		logger.info("API Call: "+testInputData.get("host")+END_POINT_PREFIX);
 		return APICallUtil.getResponseBody(response).getString("cash_credits");
+		
 	}
 	
 	/**
@@ -35,6 +36,7 @@ public class PlivoActions extends CommonActions{
 	 */
 	public static String getPhoneNumberByIndex(int index) {
 		Response response = APICallUtil.getCall(GET_ALL_NUMBERS_ENDPOINT);
+		logger.info("API Call: "+testInputData.get("host")+GET_ALL_NUMBERS_ENDPOINT);
 		return APICallUtil.getResponseBody(response).getJSONArray("objects").getJSONObject(index).getString("number");
 	}
 	
@@ -46,6 +48,9 @@ public class PlivoActions extends CommonActions{
 	 * @return uuid 
 	 */
 	public static int sendMessage(String senderNumber, String recipientNumber, String messageText) {
+		logger.info("src number: "+senderNumber);
+		logger.info("dst number: "+recipientNumber);
+		logger.info("Message text: "+messageText);
 		return callSendMessageAPI(senderNumber, recipientNumber, messageText).getStatusCode();
 	}
 	
@@ -55,6 +60,7 @@ public class PlivoActions extends CommonActions{
 		formData.put("text", messageText);
 		formData.put("src", senderNumber);
 		
+		logger.info("API Call: "+testInputData.get("host")+SEND_MESSAGE_ENDPOINT);
 		return APICallUtil.postCallWithFormData(SEND_MESSAGE_ENDPOINT, formData);
 	}
 	
@@ -71,6 +77,7 @@ public class PlivoActions extends CommonActions{
 	 */
 	public static String getTotalRateOfSentMessage(String uuid) {
 		Response response = APICallUtil.getCall(SEND_MESSAGE_ENDPOINT+uuid+"/");
+		logger.info("API Call: "+testInputData.get("host")+SEND_MESSAGE_ENDPOINT+uuid+"/");
 		return APICallUtil.getResponseBody(response).getString("total_rate");
 		
 	}
@@ -81,6 +88,7 @@ public class PlivoActions extends CommonActions{
 	 */
 	public static String getOutboundRate() {
 		Response response = APICallUtil.getCall(GET_PRICING_ENDPOINT);
+		logger.info("API Call: "+testInputData.get("host")+GET_PRICING_ENDPOINT);
 		return APICallUtil.getResponseBody(response).getJSONObject("message").getJSONObject("outbound").getString("rate").toString();
 	}
 	
